@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Differences</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { border: 1px solid black; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Find the Differences!</h1>
+    <p id="status">Level 1 - Differences Found: 0 / 3</p>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const statusText = document.getElementById("status");
+
+        // Levels Configuration
+        const levels = [
+            {
+                image1: 'berea.jpg',       // Replace with your first image URL
+        
+                image1: 'library-icon.jpg',
+                differences: [
+                    { x: 1, y: 1, found: false },
+                    { x: 30, y: 1, found: false },
+                    { x: 50, y: 1, found: false }
+                ]
+            },
+            {
+                image2: 'Berea Logo1111.jpg' , // Replace with actual image URL for level 2
+                image2: 'Screenshot 2024-09-02 050132.png',
+                differences: [
+                    { x: 100, y: 100, found: false },
+                    { x: 350, y: 250, found: false },
+                    { x: 600, y: 150, found: false }
+                ]
+            }
+        ];
+
+        let currentLevel = 0;
+        let differences = [];
+
+        const image1 = new Image();
+        const image2 = new Image();
+
+        function loadLevel(levelIndex) {
+            const level = levels[levelIndex];
+            image1.src = level.image1;
+            image2.src = level.image2;
+            differences = JSON.parse(JSON.stringify(level.differences)); // Deep copy to reset found states
+            updateStatus();
+            image1.onload = () => image2.onload = draw; // Draw when both images are loaded
+        }
+
+        function updateStatus() {
+            const foundCount = differences.filter(diff => diff.found).length;
+            const totalCount = differences.length;
+            statusText.textContent = `Level ${currentLevel + 1} - Differences Found: ${foundCount} / ${totalCount}`;
+
+            // Check if all differences are found
+            if (foundCount === totalCount) {
+                if (currentLevel < levels.length - 1) {
+                    alert(`Level ${currentLevel + 1} Complete! Proceeding to Level ${currentLevel + 2}`);
+                    currentLevel++;
+                    loadLevel(currentLevel);
+                } else {
+                    alert("Congratulations! You completed all levels!");
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image1, 0, 0);           // Draw the first image
+            ctx.drawImage(image2, 400, 0);        // Draw the second image to the right
+
+            differences.forEach(diff => {
+                if (diff.found) {
+                    ctx.strokeStyle = "green";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(diff.x, diff.y, 20, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            });
+        }
+
+        canvas.addEventListener("click", (event) => {
+            const x = event.offsetX;
+            const y = event.offsetY;
+
+            differences.forEach(diff => {
+                if (!diff.found) {
+                    const distance = Math.sqrt((x - diff.x) ** 2 + (y - diff.y) ** 2);
+                    if (distance < 20) {
+                        diff.found = true;
+                        alert("You found a difference!");
+                        updateStatus();
+                        draw();
+                    }
+                }
+            });
+        });
+
+        // Load the first level on page load
+        loadLevel(currentLevel);
+    </script>
+</body>
+</html>
