@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,12 +26,18 @@
             font-size: 1em;
             margin: 10px 0;
         }
+        #message {
+            font-size: 1.2em;
+            color: green;
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>ልዩነቱን ማግኘት ይችላሉ</h1>
     <p id="status">Level 1 - Differences Found: 0 / 3</p>
     <canvas id="gameCanvas"></canvas>
+    <div id="message"></div>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -41,6 +48,7 @@
         canvas.height = screenWidth * 1.5; // Adjusted for vertical layout
 
         const statusText = document.getElementById("status");
+        const messageDiv = document.getElementById("message");
 
         // Levels Configuration
         const levels = [
@@ -48,28 +56,18 @@
                 image1: 'photo_2022-02-.png', // Replace with actual image URL
                 image2: 'Screenshot (.png',
                 differences: [
-                    { x: 3, y: 1, found: false },
-                    { x: 1, y: 300, found: false },
-                    { x: 1, y: 400, found: false }
+                    { x: 100, y: 150, found: false },
+                    { x: 200, y: 250, found: false },
+                    { x: 400, y: 350, found: false }
                 ]
             },
             {
-                image1: 'level2_image1.jpg', // Replace with actual image URL
-                image2: 'level2_image2.jpg',
+                image1: 'image1-level2.png', // Replace with actual image URL
+                image2: 'image2-level2.png',
                 differences: [
-                    { x: 1, y: 1, found: false },
-                   // { x: 350, y: 250, found: false },
-                    //{ x: 600, y: 500, found: false }
-                ]
-            }
-            ,
-            {
-                image1: 'level2_image1.jpg', // Replace with actual image URL
-                image2: 'level2_image2.jpg',
-                differences: [
-                    { x: 120, y: 150, found: false },
-                    { x: 350, y: 250, found: false },
-                    { x: 600, y: 500, found: false }
+                    { x: 120, y: 180, found: false },
+                    { x: 300, y: 250, found: false },
+                    { x: 500, y: 400, found: false }
                 ]
             }
         ];
@@ -80,9 +78,13 @@
         const image1 = new Image();
         const image2 = new Image();
 
+        function showMessage(message) {
+            messageDiv.textContent = message;
+        }
+
         function loadLevel(levelIndex) {
             if (levelIndex >= levels.length) {
-                alert("Congratulations! You've completed all levels!");
+                showMessage("እንኳን ደስ አለዎት! ሁሉንም ደረጃዎች በተሳካ ሁኔታ አልተሳክተዋል!");
                 return;
             }
 
@@ -93,6 +95,7 @@
             image1.onload = () => image2.onload = draw; // Draw images when loaded
             differences = JSON.parse(JSON.stringify(level.differences)); // Reset differences
             updateStatus();
+            showMessage(""); // Clear message for the new level
         }
 
         function updateStatus() {
@@ -101,9 +104,9 @@
             statusText.textContent = `Level ${currentLevel + 1} - Differences Found: ${foundCount} / ${totalCount}`;
 
             if (foundCount === totalCount) {
-                alert(`Level ${currentLevel + 1} Complete!`);
+                showMessage(`Level ${currentLevel + 1} Complete!`);
                 currentLevel++;
-                loadLevel(currentLevel);
+                setTimeout(() => loadLevel(currentLevel), 2000); // Delay before loading the next level
             }
         }
 
