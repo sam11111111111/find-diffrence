@@ -1,5 +1,4 @@
-
-               <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Find the Differences!</h1>
+    <h1>Find the Differences! v</h1>
     <p id="status">Level 1 - Differences Found: 0 / 3</p>
     <canvas id="gameCanvas"></canvas>
     <script>
@@ -49,9 +48,18 @@
                 image1: 'photo_2022-02-.png', // Replace with actual image URL
                 image2: 'Screenshot (.png',
                 differences: [
-                    { x: 100, y: 100, found: false },
-                    { x: 400, y: 300, found: false },
-                    { x: 500, y: 700, found: false }
+                    { x: 3, y: 1, found: false },
+                    { x: 1, y: 300, found: false },
+                    { x: 1, y: 400, found: false }
+                ]
+            },
+            {
+                image1: 'level2_image1.jpg', // Replace with actual image URL
+                image2: 'level2_image2.jpg',
+                differences: [
+                    { x: 120, y: 150, found: false },
+                    { x: 350, y: 250, found: false },
+                    { x: 600, y: 500, found: false }
                 ]
             }
         ];
@@ -63,6 +71,11 @@
         const image2 = new Image();
 
         function loadLevel(levelIndex) {
+            if (levelIndex >= levels.length) {
+                alert("Congratulations! You've completed all levels!");
+                return;
+            }
+
             const level = levels[levelIndex];
             image1.src = level.image1;
             image2.src = level.image2;
@@ -78,7 +91,9 @@
             statusText.textContent = `Level ${currentLevel + 1} - Differences Found: ${foundCount} / ${totalCount}`;
 
             if (foundCount === totalCount) {
-                alert("Congratulations! You've found all differences!");
+                alert(`Level ${currentLevel + 1} Complete!`);
+                currentLevel++;
+                loadLevel(currentLevel);
             }
         }
 
