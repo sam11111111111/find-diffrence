@@ -192,47 +192,54 @@
         canvas.addEventListener("touchstart", handleTouch);
 
         // Firework Effect
-        function triggerFireworks() {
-            const colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff", "#ffff00"];
-            const fireworks = [];
+       function triggerFireworks() {
+    const colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff", "#ffff00", "#ff6600", "#99ff66", "#ff00cc", "#ffff99"];
+    const fireworks = [];
 
-            for (let i = 0; i < 50; i++) {
-                fireworks.push(new Firework());
+    // Increase the number of fireworks
+    for (let i = 0; i < 150; i++) { // Increased the number to 150
+        fireworks.push(new Firework());
+    }
+
+    function Firework() {
+        this.x = Math.random() * fireworksCanvas.width;
+        this.y = Math.random() * fireworksCanvas.height;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.size = Math.random() * 10 + 5; // Increased size range
+        this.alpha = 1;
+        this.velocityX = (Math.random() - 0.5) * 10; // Increased speed
+        this.velocityY = (Math.random() - 0.5) * 10; // Increased speed
+    }
+
+    function drawFireworks() {
+        fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+        fireworks.forEach(firework => {
+            fireworksCtx.beginPath();
+            fireworksCtx.arc(firework.x, firework.y, firework.size, 0, Math.PI * 2);
+            fireworksCtx.fillStyle = firework.color;
+            fireworksCtx.fill();
+            
+            // Move the firework particles
+            firework.x += firework.velocityX;
+            firework.y += firework.velocityY;
+            firework.alpha -= 0.005; // Slower alpha decay
+
+            // Remove fireworks that are no longer visible
+            if (firework.alpha <= 0) {
+                fireworks.splice(fireworks.indexOf(firework), 1);
             }
+        });
 
-            function Firework() {
-                this.x = Math.random() * fireworksCanvas.width;
-                this.y = Math.random() * fireworksCanvas.height;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.size = Math.random() * 5 + 1;
-                this.alpha = 1;
-                this.velocityX = (Math.random() - 0.5) * 5;
-                this.velocityY = (Math.random() - 0.5) * 5;
-            }
-
-            function drawFireworks() {
-                fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-                fireworks.forEach(firework => {
-                    fireworksCtx.beginPath();
-                    fireworksCtx.arc(firework.x, firework.y, firework.size, 0, Math.PI * 2);
-                    fireworksCtx.fillStyle = firework.color;
-                    fireworksCtx.fill();
-                    firework.x += firework.velocityX;
-                    firework.y += firework.velocityY;
-                    firework.alpha -= 0.01;
-
-                    if (firework.alpha <= 0) {
-                        fireworks.splice(fireworks.indexOf(firework), 1);
-                    }
-                });
-
-                if (fireworks.length > 0) {
-                    requestAnimationFrame(drawFireworks);
-                }
-            }
-
-            drawFireworks();
+        // Continue the animation if there are fireworks left
+        if (fireworks.length > 0) {
+            requestAnimationFrame(drawFireworks);
         }
+    }
+
+    drawFireworks();
+}
+
 
         // Load the first level
         loadLevel(currentLevel);
