@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find the Differences - Vertical Layout</title>
+    <title>Find the Differences - Fireworks Effect</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,6 +11,7 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            position: relative;
         }
         canvas {
             border: 1px solid black;
@@ -26,39 +26,50 @@
             font-size: 1em;
             margin: 10px 0;
         }
-
-    #message {
-    font-size: 1.5em;
-    color: green;
-    margin: 20px auto;
-    text-align: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none; /* Initially hidden */
-    background: #ECFFE6; /* Optional: Add a background for better visibility */
-    padding: 20px;
-    border-radius: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
-}
-
-
+        #message {
+            font-size: 1.5em;
+            color: green;
+            margin: 20px auto;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            background: #ECFFE6;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Keep behind game elements */
+        }
     </style>
 </head>
 <body>
-    <h1>ልዩነቱን ማግኘት ይችላሉ</h1>
+    <h1>Find the Differences</h1>
     <p id="status">Level 1 - Differences Found: 0 / 3</p>
     <canvas id="gameCanvas"></canvas>
+    <canvas id="fireworksCanvas"></canvas>
     <div id="message"></div>
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const fireworksCanvas = document.getElementById("fireworksCanvas");
+        const fireworksCtx = fireworksCanvas.getContext("2d");
 
         // Responsive canvas size
         const screenWidth = Math.min(window.innerWidth, 600); // Max width for desktop
         canvas.width = screenWidth;
         canvas.height = screenWidth * 1.5; // Adjusted for vertical layout
+        fireworksCanvas.width = window.innerWidth;
+        fireworksCanvas.height = window.innerHeight;
 
         const statusText = document.getElementById("status");
         const messageDiv = document.getElementById("message");
@@ -73,15 +84,6 @@
                     { x: 200, y: 250, found: false },
                     { x: 400, y: 350, found: false }
                 ]
-            },
-            {
-                image1: 'Screenshot (.png', // Replace with actual image URL
-                image2: 'photo_2022-02-.png',
-                differences: [
-                    { x: 1, y: 1, found: false },
-                   // { x: 300, y: 250, found: false },
-                    //{ x: 500, y: 400, found: false }
-                ]
             }
         ];
 
@@ -91,41 +93,39 @@
         const image1 = new Image();
         const image2 = new Image();
 
-   function showMessage(message) {
-    if (message) {
-        messageDiv.textContent = message;
-        messageDiv.style.display = "block";
-    } else {
-        messageDiv.style.display = "none";
-    }
-}
+        function showMessage(message) {
+            if (message) {
+                messageDiv.textContent = message;
+                messageDiv.style.display = "block";
+            } else {
+                messageDiv.style.display = "none";
+            }
+        }
 
+        function loadLevel(levelIndex) {
+            if (levelIndex >= levels.length) {
+                showMessage("Congratulations! You've completed all levels!");
+                celebrate();
+                return;
+            }
 
-function loadLevel(levelIndex) {
-    if (levelIndex >= levels.length) {
-        showMessage("እንኳን ደስ አለዎት!🎉🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች👀! የምር የቁም ጭብጨባ👏🧍ይገባዎታል ... እና ተጨማሪ ኬክም!😉\n በቁም ነገር ግን እራስህን በምናባዊ የወርቅ ሜዳሊያ ያዝ 🥇");
-        return;
-    }
+            showMessage(""); // Clear the message
+            const level = levels[levelIndex];
+            image1.src = level.image1;
+            image2.src = level.image2;
 
-    showMessage(""); // Clear the message
-    const level = levels[levelIndex];
-    image1.src = level.image1;
-    image2.src = level.image2;
-
-    image1.onload = () => image2.onload = draw; // Draw images when loaded
-    differences = JSON.parse(JSON.stringify(level.differences)); // Reset differences
-    updateStatus();
-}
-
-
+            image1.onload = () => image2.onload = draw; // Draw images when loaded
+            differences = JSON.parse(JSON.stringify(level.differences)); // Reset differences
+            updateStatus();
+        }
 
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `ደረጃ ${currentLevel + 1} ${foundCount} / ${totalCount} ልዩነቶች ተገኝተዋል`;
+            statusText.textContent = `Level ${currentLevel + 1} - Differences Found: ${foundCount} / ${totalCount}`;
 
             if (foundCount === totalCount) {
-                showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ!`);
+                showMessage(`Level ${currentLevel + 1} Complete!`);
                 currentLevel++;
                 setTimeout(() => loadLevel(currentLevel), 2000); // Delay before loading the next level
             }
@@ -178,7 +178,61 @@ function loadLevel(levelIndex) {
             });
         }
 
-        // Add both click and touch event listeners
+        // Fireworks Logic
+        let fireworks = [];
+
+        function createFirework(x, y) {
+            const particles = [];
+            const colors = ["#FF5733", "#FFC300", "#DAF7A6", "#FF33D4", "#33FFF3"];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    dx: (Math.random() - 0.5) * 4,
+                    dy: (Math.random() - 0.5) * 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 100,
+                });
+            }
+            fireworks.push(...particles);
+        }
+
+        function drawFireworks() {
+            fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+            fireworks.forEach((particle, index) => {
+                if (particle.life > 0) {
+                    fireworksCtx.beginPath();
+                    fireworksCtx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+                    fireworksCtx.fillStyle = particle.color;
+                    fireworksCtx.fill();
+
+                    particle.x += particle.dx;
+                    particle.y += particle.dy;
+                    particle.dy += 0.05; // Gravity effect
+                    particle.life -= 1;
+                } else {
+                    fireworks.splice(index, 1);
+                }
+            });
+
+            if (fireworks.length > 0) {
+                requestAnimationFrame(drawFireworks);
+            }
+        }
+
+        function celebrate() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFirework(
+                        Math.random() * fireworksCanvas.width,
+                        Math.random() * fireworksCanvas.height
+                    );
+                }, i * 500);
+            }
+            drawFireworks();
+        }
+
+        // Add event listener
         canvas.addEventListener("touchstart", handleTouch);
 
         // Load the first level
