@@ -134,7 +134,7 @@
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `ደረጃ ${currentLevel + 1} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; ስንት አገኘህ ከ ${totalCount} 👉 ${foundCount}`;
+            statusText.innerHTML = `ደረጃ ${currentLevel + 1} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; ስንት አገኘህ ከ ${totalCount} 👉 ${foundCount}`;
 
             if (foundCount === totalCount) {
                 showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ! 🎉`);
