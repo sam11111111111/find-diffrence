@@ -103,7 +103,7 @@
 
 function loadLevel(levelIndex) {
     if (levelIndex >= levels.length) {
-        showMessage("እንኳን ደስ አለዎት!🎉🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች! የቁም ጭብጨባ ይገባዎታል ... እና ተጨማሪ ኬክም!");
+        showMessage("እንኳን ደስ አለዎት!🎉🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች👀! የምር የቁም ጭብጨባ👏🧍ይገባዎታል ... እና ተጨማሪ ኬክም!😉\n በቁም ነገር ግን እራስህን በምናባዊ የወርቅ ሜዳሊያ ያዝ 🥇");
         return;
     }
 
@@ -122,10 +122,10 @@ function loadLevel(levelIndex) {
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `Level ${currentLevel + 1} - Differences Found: ${foundCount} / ${totalCount}`;
+            statusText.textContent = `ደረጃ ${currentLevel + 1} ${foundCount} / ${totalCount} ልዩነቶች ተገኝተዋል`;
 
             if (foundCount === totalCount) {
-                showMessage(`Level ${currentLevel + 1} Complete!`);
+                showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ!`);
                 currentLevel++;
                 setTimeout(() => loadLevel(currentLevel), 2000); // Delay before loading the next level
             }
