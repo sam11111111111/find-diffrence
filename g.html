@@ -48,7 +48,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1;/*  Keep behind game elements */
+           z-index: -1; /* Keep behind game elements */
         }
     </style>
 </head>
@@ -197,7 +197,7 @@
     const fireworks = [];
 
     // Increase the number of fireworks
-    for (let i = 0; i < 450; i++) { // Increased the number to 150
+    for (let i = 0; i < 550; i++) { // Increased the number to 150
         fireworks.push(new Firework());
     }
 
@@ -243,7 +243,7 @@ switch(randomEdge) {
             // Move the firework particles
             firework.x += firework.velocityX;
             firework.y += firework.velocityY;
-            firework.alpha -= 0.00005; // Slower alpha decay
+            firework.alpha -= 0.00000001; // Slower alpha decay
 
             // Remove fireworks that are no longer visible
             if (firework.alpha <= 0) {
