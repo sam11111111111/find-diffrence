@@ -116,7 +116,7 @@
         function loadLevel(levelIndex) {
             if (levelIndex >= levels.length) {
 
-                showMessage("🎉እንኳን ደስ አለዎት!🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች👀! የምር የቁም ጭብጨባ ይገባዎታል👏🧍 ... እና ተጨማሪ ኬክም!😉");
+                showMessage("🎉እንኳን ደስ አለዎት!🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች👀! የምር የቁም ጭብጨባ ይገባዎታል👏🧍 ... እና ተጨማሪ ኬክም!😉🍰");
                 triggerFireworks(); // Trigger fireworks after finishing all levels
                 return;
             }
@@ -134,7 +134,7 @@
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `ደረጃ ${currentLevel + 1} ስንት አገኘህ ከ ${totalCount} 👉 ${foundCount}`;
+            statusText.textContent = `ደረጃ ${currentLevel + 1} \t\tስንት አገኘህ ከ ${totalCount} 👉 ${foundCount}`;
 
             if (foundCount === totalCount) {
                 showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ! 🎉`);
