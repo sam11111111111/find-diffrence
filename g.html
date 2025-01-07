@@ -26,11 +26,22 @@
             font-size: 1em;
             margin: 10px 0;
         }
-        #message {
-            font-size: 1.2em;
-            color: green;
-            margin: 20px;
-        }
+       #message {
+    font-size: 1.5em;
+    color: green;
+    margin: 20px auto;
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none; /* Initially hidden */
+    background: #ffffff; /* Optional: Add a background for better visibility */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+}
+
     </style>
 </head>
 <body>
@@ -78,25 +89,33 @@
         const image1 = new Image();
         const image2 = new Image();
 
-        function showMessage(message) {
-            messageDiv.textContent = message;
-        }
+   function showMessage(message) {
+    if (message) {
+        messageDiv.textContent = message;
+        messageDiv.style.display = "block";
+    } else {
+        messageDiv.style.display = "none";
+    }
+}
 
-        function loadLevel(levelIndex) {
-            if (levelIndex >= levels.length) {
-                showMessage("እንኳን ደስ አለዎት! ሁሉንም ደረጃዎች በተሳካ ሁኔታ አልተሳክተዋል!");
-                return;
-            }
+        
+function loadLevel(levelIndex) {
+    if (levelIndex >= levels.length) {
+        showMessage("እንኳን ደስ አለዎት! ሁሉንም ደረጃዎች በተሳካ ሁኔታ አልተሳክተዋል!");
+        return;
+    }
 
-            const level = levels[levelIndex];
-            image1.src = level.image1;
-            image2.src = level.image2;
+    showMessage(""); // Clear the message
+    const level = levels[levelIndex];
+    image1.src = level.image1;
+    image2.src = level.image2;
 
-            image1.onload = () => image2.onload = draw; // Draw images when loaded
-            differences = JSON.parse(JSON.stringify(level.differences)); // Reset differences
-            updateStatus();
-            showMessage(""); // Clear message for the new level
-        }
+    image1.onload = () => image2.onload = draw; // Draw images when loaded
+    differences = JSON.parse(JSON.stringify(level.differences)); // Reset differences
+    updateStatus();
+}
+
+
 
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
