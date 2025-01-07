@@ -16,7 +16,7 @@
         canvas {
             border: 1px solid black;
             display: block;
-            margin: 20px auto; 
+            margin: 20px auto;
         }
         h1 {
             font-size: 1.5em;
@@ -26,7 +26,8 @@
             font-size: 1em;
             margin: 10px 0;
         }
-       #message {
+
+    #messagee {
     font-size: 1.5em;
     color: green;
     margin: 20px auto;
@@ -38,8 +39,11 @@
     display: none; /* Initially hidden */
     background: #ffffff; /* Optional: Add a background for better visibility */
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+}
+#message{
+
 }
 
     </style>
@@ -98,11 +102,10 @@
     }
 }
 
-        
+
 function loadLevel(levelIndex) {
     if (levelIndex >= levels.length) {
         showMessage("እንኳን ደስ አለዎት!🎉🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች! የቁም ጭብጨባ ይገባዎታል ... እና ተጨማሪ ኬክም!");
-       
         return;
     }
 
