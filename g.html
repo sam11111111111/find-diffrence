@@ -13,7 +13,7 @@
             background-color: #f4f4f4;
         }
         canvas {
-            border: 1px solid black;
+            border: 1px hidden black;
             display: block;
             margin: 30px auto;
         }
@@ -54,7 +54,7 @@
 </head>
 <body>
     <h1>ልዩነቱን ማግኘት ይችላሉ</h1>
-    <p id="status">Level 1 - Differences Found: 0 / 3</p>
+    <p id="status">ደረጃ 1 - ልዩነቶች ተገኝተዋል: 0 / 3</p>
     <canvas id="gameCanvas"></canvas>
     <canvas id="fireworksCanvas"></canvas>
     <div id="message"></div>
@@ -132,7 +132,7 @@
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `ደረጃ ${currentLevel + 1} ${foundCount} / ${totalCount}-  ልዩነቶች ተገኝተዋል`;
+            statusText.textContent = `ደረጃ ${currentLevel + 1} -  - ${foundCount} / ${totalCount} -  ልዩነቶች ተገኝተዋል`;
 
             if (foundCount === totalCount) {
                 showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ!`);
@@ -197,7 +197,7 @@
     const fireworks = [];
 
     // Increase the number of fireworks
-    for (let i = 0; i < 550; i++) { // Increased the number to 150
+    for (let i = 0; i < 600; i++) { // Increased the number to 150
         fireworks.push(new Firework());
     }
 
@@ -243,7 +243,7 @@ switch(randomEdge) {
             // Move the firework particles
             firework.x += firework.velocityX;
             firework.y += firework.velocityY;
-            firework.alpha -= 0.00000001; // Slower alpha decay
+            firework.alpha -= 0.0000000001; // Slower alpha decay
 
             // Remove fireworks that are no longer visible
             if (firework.alpha <= 0) {
