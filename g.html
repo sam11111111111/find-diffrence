@@ -221,15 +221,10 @@
         }
 
         function celebrate() {
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    createFirework(
-                        Math.random() * fireworksCanvas.width,
-                        Math.random() * fireworksCanvas.height
-                    );
-                }, i * 500);
-            }
-            drawFireworks();
+            setTimeout(() => {
+                createFirework(fireworksCanvas.width / 2, fireworksCanvas.height / 2);
+                drawFireworks();
+            }, 500);
         }
 
         // Add event listener
