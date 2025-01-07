@@ -132,7 +132,7 @@
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `ደረጃ ${currentLevel + 1} ${foundCount} / ${totalCount} ልዩነቶች ተገኝተዋል`;
+            statusText.textContent = `ደረጃ ${currentLevel + 1} ${foundCount} / ${totalCount}-  ልዩነቶች ተገኝተዋል`;
 
             if (foundCount === totalCount) {
                 showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ!`);
@@ -202,8 +202,28 @@
     }
 
     function Firework() {
+const randomEdge = Math.floor(Math.random() * 4);
+switch(randomEdge) {
+    case 0: // Top edge
         this.x = Math.random() * fireworksCanvas.width;
+        this.y = 0;
+        break;
+    case 1: // Right edge
+        this.x = fireworksCanvas.width;
         this.y = Math.random() * fireworksCanvas.height;
+        break;
+    case 2: // Bottom edge
+        this.x = Math.random() * fireworksCanvas.width;
+        this.y = fireworksCanvas.height;
+        break;
+    case 3: // Left edge
+        this.x = 0;
+        this.y = Math.random() * fireworksCanvas.height;
+        break;
+}
+
+
+        
         this.color = colors[Math.floor(Math.random() * colors.length)];
         this.size = Math.random() * 10 + 5; // Increased size range
         this.alpha = 1;
