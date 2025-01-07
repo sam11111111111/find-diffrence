@@ -27,7 +27,7 @@
         }
 
         #message {
-            font-size: 1.5em;
+            font-size: 1.0em;
             color: green;
             margin: 20px auto;
             text-align: center;
@@ -39,7 +39,8 @@
             background: #ECFFE6; /* Optional: Add a background for better visibility */
             padding: 20px;
             border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+          /*   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); Optional shadow */
+            box-shadow: 10px 10px lightblue;
         }
 
         #fireworksCanvas {
@@ -114,6 +115,7 @@
 
         function loadLevel(levelIndex) {
             if (levelIndex >= levels.length) {
+
                 showMessage("እንኳን ደስ አለዎት!🎉🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች👀! የምር የቁም ጭብጨባ👏🧍ይገባዎታል ... እና ተጨማሪ ኬክም!😉");
                 triggerFireworks(); // Trigger fireworks after finishing all levels
                 return;
@@ -132,10 +134,10 @@
         function updateStatus() {
             const foundCount = differences.filter(diff => diff.found).length;
             const totalCount = differences.length;
-            statusText.textContent = `ደረጃ ${currentLevel + 1} -  - ${foundCount} / ${totalCount} -  ልዩነቶች ተገኝተዋል`;
+            statusText.textContent = `ደረጃ ${currentLevel + 1} ስንት አገኘህ ከ ${totalCount} 👉 ${foundCount} -  ልዩነቶች ተገኝተዋል`;
 
             if (foundCount === totalCount) {
-                showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ!`);
+                showMessage(`ደረጃ ${currentLevel + 1} ተጠናቀቀ! 🎉`);
                 currentLevel++;
                 setTimeout(() => loadLevel(currentLevel), 2000); // Delay before loading the next level
             }
@@ -197,7 +199,7 @@
     const fireworks = [];
 
     // Increase the number of fireworks
-    for (let i = 0; i < 600; i++) { // Increased the number to 150
+    for (let i = 0; i < 1000; i++) { // Increased the number to 150
         fireworks.push(new Firework());
     }
 
@@ -243,7 +245,7 @@ switch(randomEdge) {
             // Move the firework particles
             firework.x += firework.velocityX;
             firework.y += firework.velocityY;
-            firework.alpha -= 0.0000000001; // Slower alpha decay
+            firework.alpha -= 0.000000000001; // Slower alpha decay
 
             // Remove fireworks that are no longer visible
             if (firework.alpha <= 0) {
