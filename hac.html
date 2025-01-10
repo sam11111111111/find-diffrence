@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Find the Differences - Vertical Layout</title>
@@ -13,6 +14,46 @@
             background-color: #f4f4f4;
         }
 
+   .password-container {
+      position: relative;
+      width: 300px;
+    }
+    .password-container input {
+      width: 90%;
+      padding: 10px 40px 10px 10px; /* Add padding for the icon */
+      
+    }
+ .password-container .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      color: #007BFF;
+    }
+.hr-with-text {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+    }
+    .hr-with-text::before,
+    .hr-with-text::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #ccc;
+    }
+    .hr-with-text::before {
+      margin-right: 10px;
+    }
+    .hr-with-text::after {
+      margin-left: 10px;
+    }
+    .hr-with-text span {
+      font-size: 16px;
+      font-weight: bold;
+      color: #555;
+    }
     </style>
 </head>
 <body>
@@ -20,15 +61,55 @@
 
  Mobile number or email
  <br>
- <input type="" name="" style="width: 320px;"> <br>
+ <input type="" name="" style="width: 317px; height: 32px;" > <br>
 
  Password <br>
- <input type="" name="" style="width: 320px;"> <br><br>
 
-<button style="background-color:#5AB2FF; color:white; width: 330px; height: 40px;">Login</button><br>
+ <!-- <input type="" name="" style="width: 320px; height: 28px;"> <br><br>
+-->
+
+<div class="password-container">
+    <input type="password" id="password">
+    <i class="bi bi-eye toggle-password" id="togglePassword"></i>
+  </div>
+
+
+
+
+
+<script>
+    const passwordField = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+
+    togglePassword.addEventListener('click', () => {
+      // Toggle the input type between "password" and "text"
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        togglePassword.classList.remove('bi-eye');
+        togglePassword.classList.add('bi-eye-slash');
+      } else {
+        passwordField.type = 'password';
+        togglePassword.classList.remove('bi-eye-slash');
+        togglePassword.classList.add('bi-eye');
+      }
+    });
+  </script>
+
+
+
+
+<br>
+
+<button style="background-color:#5892fd; color:white; width: 330px; height: 40px;">Login</button><br>
 <a href="" style="text-decoration-line: none;">Forgot Password?</a><br>
-<hr> <center> or </center><br>
-<center><button style="color:white; background-color: green; width: 180px; height: 45px;" ><h4>Create new account</h4></button> </center>
+
+
+  <div class="hr-with-text">
+    <span>or</span>
+  </div><br>
+
+
+<center><button style="color:white; background-color: #30a24a; width: 180px; height: 50px;" ><h4>Create new account</h4></button> </center>
 <br>
 <h4> English(US)</h4> <a href=""></a> <a href=""></a>
 <a href="" style="text-decoration-line: none; color: #5AB2FF;" >አማርኛ</a> <br><br>
