@@ -13,12 +13,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         let scene, camera, renderer, player, maze = [];
-        const mazeSize = 10; // Size of the maze grid (10x10)
-        const cellSize = 1; // Size of each maze cell
-        const speed = 0.1;
+        const mazeSize = 10; // Maze grid size (10x10)
+        const cellSize = 1; // Size of each cell
+        const moveSpeed = 0.05; // Speed of player movement
+        let isMoving = false; // Prevent overlapping moves
+        let targetPosition = null; // Where the player is moving
 
         function createMaze(size) {
-            // Generate a simple grid maze (for now, all paths are open)
             for (let i = 0; i < size; i++) {
                 maze[i] = [];
                 for (let j = 0; j < size; j++) {
@@ -56,7 +57,7 @@
                 }
             }
 
-            // Player Cube
+            // Player
             const playerGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
             const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
             player = new THREE.Mesh(playerGeometry, playerMaterial);
@@ -65,8 +66,6 @@
 
             // Touch Controls
             document.addEventListener('touchstart', onTouchStart, false);
-            document.addEventListener('touchmove', onTouchMove, false);
-
             animate();
         }
 
@@ -76,41 +75,56 @@
             const touch = event.touches[0];
             touchStartX = touch.clientX;
             touchStartY = touch.clientY;
+            document.addEventListener('touchend', onTouchEnd, { once: true });
         }
 
-        function onTouchMove(event) {
-            const touch = event.touches[0];
-            const deltaX = touch.clientX - touchStartX;
-            const deltaY = touch.clientY - touchStartY;
+        function onTouchEnd(event) {
+            const touchEndX = event.changedTouches[0].clientX;
+            const touchEndY = event.changedTouches[0].clientY;
+
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
 
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // Horizontal movement
-                if (deltaX > 0) movePlayer(1, 0); // Right
-                else movePlayer(-1, 0); // Left
+                // Horizontal swipe
+                if (deltaX > 0) movePlayer(1, 0); // Swipe right
+                else movePlayer(-1, 0); // Swipe left
             } else {
-                // Vertical movement
-                if (deltaY > 0) movePlayer(0, 1); // Down
-                else movePlayer(0, -1); // Up
+                // Vertical swipe
+                if (deltaY > 0) movePlayer(0, 1); // Swipe down
+                else movePlayer(0, -1); // Swipe up
             }
-
-            // Reset touch start
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
         }
 
         function movePlayer(dx, dz) {
+            if (isMoving) return; // Ignore if already moving
+
             const newX = player.position.x + dx;
             const newZ = player.position.z + dz;
 
-            // Ensure the player stays within bounds and doesn't move through walls
+            // Check bounds and collisions
             if (newX >= 0 && newX < mazeSize && newZ >= 0 && newZ < mazeSize && maze[Math.round(newX)][Math.round(newZ)] === 0) {
-                player.position.x = newX;
-                player.position.z = newZ;
+                targetPosition = { x: newX, z: newZ };
+                isMoving = true;
             }
         }
 
         function animate() {
             requestAnimationFrame(animate);
+
+            if (isMoving && targetPosition) {
+                // Smoothly move player to target position
+                player.position.x += (targetPosition.x - player.position.x) * moveSpeed;
+                player.position.z += (targetPosition.z - player.position.z) * moveSpeed;
+
+                // Snap to target position if close enough
+                if (Math.abs(player.position.x - targetPosition.x) < 0.01 && Math.abs(player.position.z - targetPosition.z) < 0.01) {
+                    player.position.set(targetPosition.x, 0.5, targetPosition.z);
+                    targetPosition = null;
+                    isMoving = false;
+                }
+            }
+
             renderer.render(scene, camera);
         }
 
