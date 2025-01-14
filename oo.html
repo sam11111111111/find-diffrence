@@ -7,27 +7,49 @@
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
+        #mini-map {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            border: 2px solid black;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
     </style>
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <canvas id="mini-map"></canvas>
     <script>
         let scene, camera, renderer, player, maze = [];
         const mazeSize = 10; // Maze grid size (10x10)
         const cellSize = 1; // Size of each cell
-        const moveSpeed = 0.5; // Speed of player movement
+        const moveSpeed = 0.05; // Speed of player movement
         let isMoving = false; // Prevent overlapping moves
         let targetPosition = null; // Target position for player movement
 
-        function createMaze(size) {
-            for (let i = 0; i < size; i++) {
+        // Custom maze (hardcoded example)
+        const customMaze = [
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1, 1, 0],
+            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+            [1, 1, 1, 0, 1, 1, 0, 1, 1, 0],
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+            [1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+            [0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+            [1, 0, 1, 1, 1, 0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+        ];
+
+        function createMaze() {
+            for (let i = 0; i < mazeSize; i++) {
                 maze[i] = [];
-                for (let j = 0; j < size; j++) {
-                    maze[i][j] = Math.random() > 0.2 ? 0 : 1; // 0 = path, 1 = wall
+                for (let j = 0; j < mazeSize; j++) {
+                    maze[i][j] = customMaze[i][j] || 0; // Using custom maze values
                 }
             }
-            maze[0][0] = 0; // Start point
-            maze[size - 1][size - 1] = 0; // End point
         }
 
         function init() {
@@ -40,7 +62,7 @@
             document.body.appendChild(renderer.domElement);
 
             // Generate Maze
-            createMaze(mazeSize);
+            createMaze();
 
             // Draw Maze
             const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
@@ -64,6 +86,9 @@
 
             // Touch Controls
             document.addEventListener('touchstart', onTouchStart, false);
+
+            // Initialize Mini-map
+            initMiniMap();
 
             animate();
         }
@@ -99,6 +124,7 @@
             const newX = player.position.x + dx;
             const newZ = player.position.z + dz;
 
+            // Check if the player can move to the new cell
             if (newX >= 0 && newX < mazeSize && newZ >= 0 && newZ < mazeSize && maze[Math.round(newX)][Math.round(newZ)] === 0) {
                 targetPosition = { x: newX, z: newZ };
                 isMoving = true;
@@ -126,7 +152,41 @@
             );
             camera.lookAt(player.position);
 
+            // Update Mini-map
+            updateMiniMap();
+
             renderer.render(scene, camera);
+        }
+
+        // Mini-map Setup
+        const miniMapCanvas = document.getElementById('mini-map');
+        const miniMapCtx = miniMapCanvas.getContext('2d');
+
+        function initMiniMap() {
+            miniMapCtx.clearRect(0, 0, miniMapCanvas.width, miniMapCanvas.height);
+            miniMapCanvas.width = 200;
+            miniMapCanvas.height = 200;
+        }
+
+        function updateMiniMap() {
+            miniMapCtx.clearRect(0, 0, miniMapCanvas.width, miniMapCanvas.height);
+
+            const mapScale = miniMapCanvas.width / mazeSize;
+            // Draw maze grid on the mini-map
+            for (let i = 0; i < mazeSize; i++) {
+                for (let j = 0; j < mazeSize; j++) {
+                    if (maze[i][j] === 1) {
+                        miniMapCtx.fillStyle = 'black';
+                        miniMapCtx.fillRect(i * mapScale, j * mapScale, mapScale, mapScale);
+                    }
+                }
+            }
+
+            // Draw player position on the mini-map
+            const playerX = player.position.x * mapScale;
+            const playerZ = player.position.z * mapScale;
+            miniMapCtx.fillStyle = 'green';
+            miniMapCtx.fillRect(playerX, playerZ, mapScale, mapScale);
         }
 
         init();
