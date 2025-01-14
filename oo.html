@@ -15,9 +15,9 @@
         let scene, camera, renderer, player, maze = [];
         const mazeSize = 10; // Maze grid size (10x10)
         const cellSize = 1; // Size of each cell
-        const moveSpeed = 0.05; // Speed of player movement
+        const moveSpeed = 0.5; // Speed of player movement
         let isMoving = false; // Prevent overlapping moves
-        let targetPosition = null; // Where the player is moving
+        let targetPosition = null; // Target position for player movement
 
         function createMaze(size) {
             for (let i = 0; i < size; i++) {
@@ -34,9 +34,7 @@
             // Scene, Camera, Renderer
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(mazeSize / 2, mazeSize, mazeSize * 1.5);
-            camera.lookAt(mazeSize / 2, 0, mazeSize / 2);
-
+            camera.position.set(0, mazeSize, mazeSize * 1.5);
             renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
@@ -66,6 +64,7 @@
 
             // Touch Controls
             document.addEventListener('touchstart', onTouchStart, false);
+
             animate();
         }
 
@@ -86,23 +85,20 @@
             const deltaY = touchEndY - touchStartY;
 
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // Horizontal swipe
                 if (deltaX > 0) movePlayer(1, 0); // Swipe right
                 else movePlayer(-1, 0); // Swipe left
             } else {
-                // Vertical swipe
                 if (deltaY > 0) movePlayer(0, 1); // Swipe down
                 else movePlayer(0, -1); // Swipe up
             }
         }
 
         function movePlayer(dx, dz) {
-            if (isMoving) return; // Ignore if already moving
+            if (isMoving) return;
 
             const newX = player.position.x + dx;
             const newZ = player.position.z + dz;
 
-            // Check bounds and collisions
             if (newX >= 0 && newX < mazeSize && newZ >= 0 && newZ < mazeSize && maze[Math.round(newX)][Math.round(newZ)] === 0) {
                 targetPosition = { x: newX, z: newZ };
                 isMoving = true;
@@ -113,17 +109,22 @@
             requestAnimationFrame(animate);
 
             if (isMoving && targetPosition) {
-                // Smoothly move player to target position
                 player.position.x += (targetPosition.x - player.position.x) * moveSpeed;
                 player.position.z += (targetPosition.z - player.position.z) * moveSpeed;
 
-                // Snap to target position if close enough
                 if (Math.abs(player.position.x - targetPosition.x) < 0.01 && Math.abs(player.position.z - targetPosition.z) < 0.01) {
                     player.position.set(targetPosition.x, 0.5, targetPosition.z);
                     targetPosition = null;
                     isMoving = false;
                 }
             }
+
+            // Camera follows the player smoothly
+            camera.position.lerp(
+                new THREE.Vector3(player.position.x, mazeSize, player.position.z + mazeSize / 2),
+                0.1
+            );
+            camera.lookAt(player.position);
 
             renderer.render(scene, camera);
         }
