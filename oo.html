@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>3D Cube Game for Mobile</title>
+    <title>Maze Rush: Escape the Void</title>
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
@@ -12,35 +12,65 @@
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer, cube;
+        let scene, camera, renderer, player, maze = [];
+        const mazeSize = 10; // Size of the maze grid (10x10)
+        const cellSize = 1; // Size of each maze cell
         const speed = 0.1;
-        let touchStartX = 0, touchStartY = 0;
+
+        function createMaze(size) {
+            // Generate a simple grid maze (for now, all paths are open)
+            for (let i = 0; i < size; i++) {
+                maze[i] = [];
+                for (let j = 0; j < size; j++) {
+                    maze[i][j] = Math.random() > 0.2 ? 0 : 1; // 0 = path, 1 = wall
+                }
+            }
+            maze[0][0] = 0; // Start point
+            maze[size - 1][size - 1] = 0; // End point
+        }
 
         function init() {
-            // Create scene
+            // Scene, Camera, Renderer
             scene = new THREE.Scene();
-
-            // Create camera
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
+            camera.position.set(mazeSize / 2, mazeSize, mazeSize * 1.5);
+            camera.lookAt(mazeSize / 2, 0, mazeSize / 2);
 
-            // Create renderer
             renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            // Create cube
-            const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
+            // Generate Maze
+            createMaze(mazeSize);
 
-            // Add touch controls
+            // Draw Maze
+            const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
+            const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xeeeeee });
+            for (let i = 0; i < mazeSize; i++) {
+                for (let j = 0; j < mazeSize; j++) {
+                    const geometry = new THREE.BoxGeometry(cellSize, cellSize / 4, cellSize);
+                    const material = maze[i][j] === 1 ? wallMaterial : floorMaterial;
+                    const cell = new THREE.Mesh(geometry, material);
+                    cell.position.set(i, maze[i][j] === 1 ? cellSize / 2 : 0, j);
+                    scene.add(cell);
+                }
+            }
+
+            // Player Cube
+            const playerGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            player = new THREE.Mesh(playerGeometry, playerMaterial);
+            player.position.set(0, 0.5, 0);
+            scene.add(player);
+
+            // Touch Controls
             document.addEventListener('touchstart', onTouchStart, false);
             document.addEventListener('touchmove', onTouchMove, false);
 
             animate();
         }
+
+        let touchStartX = 0, touchStartY = 0;
 
         function onTouchStart(event) {
             const touch = event.touches[0];
@@ -55,35 +85,34 @@
 
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 // Horizontal movement
-                if (deltaX > 0) {
-                    cube.position.x += speed; // Swipe right
-                } else {
-                    cube.position.x -= speed; // Swipe left
-                }
+                if (deltaX > 0) movePlayer(1, 0); // Right
+                else movePlayer(-1, 0); // Left
             } else {
                 // Vertical movement
-                if (deltaY > 0) {
-                    cube.position.y -= speed; // Swipe down
-                } else {
-                    cube.position.y += speed; // Swipe up
-                }
+                if (deltaY > 0) movePlayer(0, 1); // Down
+                else movePlayer(0, -1); // Up
             }
 
-            // Update starting point
+            // Reset touch start
             touchStartX = touch.clientX;
             touchStartY = touch.clientY;
+        }
+
+        function movePlayer(dx, dz) {
+            const newX = player.position.x + dx;
+            const newZ = player.position.z + dz;
+
+            // Ensure the player stays within bounds and doesn't move through walls
+            if (newX >= 0 && newX < mazeSize && newZ >= 0 && newZ < mazeSize && maze[Math.round(newX)][Math.round(newZ)] === 0) {
+                player.position.x = newX;
+                player.position.z = newZ;
+            }
         }
 
         function animate() {
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
 
         init();
     </script>
