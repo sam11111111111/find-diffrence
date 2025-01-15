@@ -23,7 +23,8 @@
     <canvas id="mini-map"></canvas>
     <script>
         let scene, camera, renderer, player, maze = [];
-        const mazeSize = 30; // Maze grid size (10x10)
+        const mazeSize = 30;
+        const mazeSize1 = 10; // Maze grid size (10x10)
         const cellSize = 1; // Size of each cell
         const moveSpeed = 0.5; // Speed of player movement
         let isMoving = false; // Prevent overlapping moves
@@ -194,8 +195,8 @@
 
             const mapScale = miniMapCanvas.width / mazeSize;
             // Draw maze grid on the mini-map
-            for (let i = 0; i < mazeSize; i++) {
-                for (let j = 0; j < mazeSize; j++) {
+            for (let i = 0; i < mazeSize1; i++) {
+                for (let j = 0; j < mazeSize1; j++) {
                     if (maze[i][j] === 1) {
                         miniMapCtx.fillStyle = 'black';
                         miniMapCtx.fillRect(i * mapScale, j * mapScale, mapScale, mapScale);
