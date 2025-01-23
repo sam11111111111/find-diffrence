@@ -11,7 +11,7 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #fef5e7; /* Light wedding-themed color */
+  background-color: #fef5e7; /* Wedding theme */
 }
 
 h1 {
@@ -20,21 +20,28 @@ h1 {
 
 .puzzle-container {
   display: grid;
-  grid-template-columns: repeat(4, 100px); /* 4x4 grid */
+  grid-template-columns: repeat(4, 1fr); /* Adjust grid size */
   grid-gap: 5px;
   margin: 20px auto;
-  width: 420px; /* Adjust based on grid size */
-  height: 420px;
+  width: 90vw; /* Responsive width for mobile */
+  height: 90vw; /* Keep it square */
+  max-width: 400px; /* Limit for larger screens */
   border: 2px solid #d4a373;
   background-color: white;
+  touch-action: manipulation; /* Improve touch responsiveness */
 }
 
 .tile {
-  width: 100px;
-  height: 100px;
-  background-size: 400px 400px; /* Match the original image size */
+  width: 100%;
+  height: 100%;
+  background-size: 400% 400%; /* Match full image size */
   cursor: pointer;
   border: 1px solid #ddd;
+  user-select: none; /* Disable text selection */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
 }
 
 button {
@@ -66,15 +73,14 @@ button:hover {
 
 
   <script type="text/javascript">
-    
-const puzzleContainer = document.getElementById("puzzle-container");
+ const puzzleContainer = document.getElementById("puzzle-container");
 const shuffleButton = document.getElementById("shuffle-btn");
 const restartButton = document.getElementById("restart-btn");
 
 let tiles = [];
 const gridSize = 4;
-const imageUrl = "dog3.png"; // Add your image here
-let draggedTile = null; // Track the tile being dragged
+const imageUrl = "dog3.png"; // Add your wedding photo
+let draggedTile = null;
 
 // Create the puzzle
 function createPuzzle() {
@@ -87,12 +93,10 @@ function createPuzzle() {
     tile.style.backgroundImage = `url(${imageUrl})`;
     tile.style.backgroundPosition = `${-(i % gridSize) * 100}px ${-Math.floor(i / gridSize) * 100}px`;
     tile.dataset.index = i;
-    tile.draggable = true; // Make the tile draggable
 
-    // Add drag-and-drop event listeners
-    tile.addEventListener("dragstart", handleDragStart);
-    tile.addEventListener("dragover", handleDragOver);
-    tile.addEventListener("drop", handleDrop);
+    // Add touch event listeners for mobile devices
+    tile.addEventListener("touchstart", handleTouchStart);
+    tile.addEventListener("touchend", handleTouchEnd);
 
     tiles.push(tile);
     puzzleContainer.appendChild(tile);
@@ -110,32 +114,38 @@ function restartPuzzle() {
   createPuzzle();
 }
 
-// Drag-and-Drop Event Handlers
-function handleDragStart(event) {
-  draggedTile = event.target; // The tile being dragged
+// Handle touchstart (select the tile)
+function handleTouchStart(event) {
+  draggedTile = event.target; // Store the selected tile
+  draggedTile.style.opacity = "0.7"; // Highlight the tile being dragged
 }
 
-function handleDragOver(event) {
-  event.preventDefault(); // Allow dropping
-}
+// Handle touchend (drop the tile)
+function handleTouchEnd(event) {
+  const targetTile = document.elementFromPoint(
+    event.changedTouches[0].clientX,
+    event.changedTouches[0].clientY
+  ); // Get the tile under the touch
 
-function handleDrop(event) {
-  const targetTile = event.target; // The tile being dropped onto
+  if (targetTile && targetTile.classList.contains("tile") && targetTile !== draggedTile) {
+    // Swap the positions of draggedTile and targetTile
+    const draggedIndex = draggedTile.dataset.index;
+    const targetIndex = targetTile.dataset.index;
 
-  // Swap positions of draggedTile and targetTile
-  const draggedIndex = draggedTile.dataset.index;
-  const targetIndex = targetTile.dataset.index;
+    // Swap dataset.index values
+    draggedTile.dataset.index = targetIndex;
+    targetTile.dataset.index = draggedIndex;
 
-  // Swap dataset.index values
-  draggedTile.dataset.index = targetIndex;
-  targetTile.dataset.index = draggedIndex;
+    // Swap the tiles visually
+    const draggedParent = draggedTile.parentElement;
+    draggedParent.insertBefore(draggedTile, targetTile.nextSibling);
+    draggedParent.insertBefore(targetTile, draggedTile);
 
-  // Swap the tiles visually
-  const draggedParent = draggedTile.parentElement;
-  draggedParent.insertBefore(draggedTile, targetTile.nextSibling);
-  draggedParent.insertBefore(targetTile, draggedTile);
+    checkWinCondition(); // Check if the puzzle is solved
+  }
 
-  checkWinCondition(); // Check if the puzzle is solved
+  draggedTile.style.opacity = "1"; // Reset tile opacity
+  draggedTile = null; // Clear the draggedTile
 }
 
 // Check if the puzzle is solved
@@ -144,7 +154,6 @@ function checkWinCondition() {
     (tile) => tile.dataset.index
   );
 
-  // If all tiles are in the correct order
   if (currentOrder.every((val, index) => val == index)) {
     alert("Congratulations! You solved the puzzle!");
   }
