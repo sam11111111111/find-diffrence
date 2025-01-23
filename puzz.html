@@ -58,14 +58,10 @@ button:hover {
 }
 
 /* Highlight clicked tile */
-.tile:hover {
-  background-color: rgba(212, 163, 115, 0.3); /* Light hover effect */
-}
-
-.tile[style*="opacity: 0.7"] {
+.tile.highlight {
+  opacity: 0.7;
   border: 2px solid #d4a373; /* Highlight selected tile */
 }
-
 
 </style>
 
@@ -82,6 +78,8 @@ button:hover {
 
   <script type="text/javascript">
 
+
+ // Add your wedding photo
 const puzzleContainer = document.getElementById("puzzle-container");
 const shuffleButton = document.getElementById("shuffle-btn");
 const restartButton = document.getElementById("restart-btn");
@@ -113,32 +111,30 @@ function createPuzzle() {
 
 // Shuffle the tiles
 function shufflePuzzle() {
-  tiles.sort(() => Math.random() - 0.5);
-  tiles.forEach((tile) => puzzleContainer.appendChild(tile));
+  tiles.sort(() => Math.random() - 0.5); // Randomize the order
+  tiles.forEach((tile) => puzzleContainer.appendChild(tile)); // Reattach tiles to container
 }
 
 // Restart the puzzle (reset to original order)
 function restartPuzzle() {
-  createPuzzle();  // Recreate puzzle in original order
+  createPuzzle(); // Recreate puzzle in original order
 }
 
 // Handle tile click (swap logic)
 function handleTileClick(event) {
   const clickedTile = event.target;
-  
+
   // If no tile is selected yet, select the first one
   if (!firstTile) {
     firstTile = clickedTile;
-    firstTile.style.opacity = "0.7";  // Highlight the clicked tile
+    firstTile.classList.add("highlight");  // Highlight the clicked tile
   } else if (firstTile && firstTile !== clickedTile) {
     // If the second tile is clicked, swap positions
     swapTiles(firstTile, clickedTile);
 
-    // Reset the highlight
-    firstTile.style.opacity = "1";
-    firstTile = null;  // Reset the first tile
-
-    // Optional: Check if the puzzle is solved (not implemented here)
+    // Reset the highlight and firstTile
+    firstTile.classList.remove("highlight");
+    firstTile = null;
   }
 }
 
