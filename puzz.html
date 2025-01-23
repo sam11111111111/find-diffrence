@@ -73,7 +73,8 @@ button:hover {
 
 
   <script type="text/javascript">
- const puzzleContainer = document.getElementById("puzzle-container");
+
+const puzzleContainer = document.getElementById("puzzle-container");
 const shuffleButton = document.getElementById("shuffle-btn");
 const restartButton = document.getElementById("restart-btn");
 
@@ -82,11 +83,15 @@ const gridSize = 4;
 const imageUrl = "dog3.png"; // Add your wedding photo
 let firstTile = null;  // Track the first tile clicked
 let secondTile = null; // Track the second tile clicked
+let originalTilesOrder = []; // To store the original order
 
-// Create the puzzle
+// Create the puzzle (with the original order)
 function createPuzzle() {
   puzzleContainer.innerHTML = ""; // Clear any existing tiles
   tiles = [];
+  
+  // Store the original order of tiles (ordered grid)
+  originalTilesOrder = [];
   
   for (let i = 0; i < gridSize * gridSize; i++) {
     const tile = document.createElement("div");
@@ -99,6 +104,7 @@ function createPuzzle() {
     tile.addEventListener("click", handleTileClick);
 
     tiles.push(tile);
+    originalTilesOrder.push(tile); // Save the tile in original order
     puzzleContainer.appendChild(tile);
   }
 }
@@ -109,9 +115,16 @@ function shufflePuzzle() {
   tiles.forEach((tile) => puzzleContainer.appendChild(tile));
 }
 
-// Restart the puzzle
+// Restart the puzzle (reset to original order)
 function restartPuzzle() {
-  createPuzzle();
+  // Reset the puzzle to the original order
+  tiles = [...originalTilesOrder];
+  tiles.forEach((tile) => puzzleContainer.appendChild(tile));
+  
+  // Optionally, reset tile opacities and styles (if necessary)
+  tiles.forEach(tile => {
+    tile.style.opacity = "1"; // Reset opacity for all tiles
+  });
 }
 
 // Handle tile click (swap logic)
@@ -119,11 +132,11 @@ function handleTileClick(event) {
   if (!firstTile) {
     // Store the first tile clicked
     firstTile = event.target;
-    firstTile.style.opacity = "0.7";  // Highlight first clicked tile
+    firstTile.style.opacity = "1.5";  // Highlight first clicked tile
   } else if (!secondTile) {
     // Store the second tile clicked
     secondTile = event.target;
-    secondTile.style.opacity = "0.7"; // Highlight second clicked tile
+    secondTile.style.opacity = "1.5"; // Highlight second clicked tile
 
     // Swap the tiles
     swapTiles(firstTile, secondTile);
@@ -155,14 +168,112 @@ function swapTiles(tile1, tile2) {
   parent.insertBefore(tile2, tile1);
 }
 
+
+
+
+
+
+
+
+        // Firework Effect
+       function triggerFireworks() {
+    const colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff", "#ffff00", "#ff6600", "#99ff66", "#ff00cc", "#ffff99"];
+    const fireworks = [];
+
+    // Increase the number of fireworks
+    for (let i = 0; i < 1000; i++) { // Increased the number to 150
+        fireworks.push(new Firework());
+    }
+
+    function Firework() {
+const randomEdge = Math.floor(Math.random() * 4);
+switch(randomEdge) {
+    case 0: // Top edge
+        this.x = Math.random() * fireworksCanvas.width;
+        this.y = 0;
+        break;
+    case 1: // Right edge
+        this.x = fireworksCanvas.width;
+        this.y = Math.random() * fireworksCanvas.height;
+        break;
+    case 2: // Bottom edge
+        this.x = Math.random() * fireworksCanvas.width;
+        this.y = fireworksCanvas.height;
+        break;
+    case 3: // Left edge
+        this.x = 0;
+        this.y = Math.random() * fireworksCanvas.height;
+        break;
+}
+
+
+
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.size = Math.random() * 15 + 5; // Increased size range
+        this.alpha = 1;
+        this.velocityX = (Math.random() - 0.5) * 10; // Increased speed
+        this.velocityY = (Math.random() - 0.5) * 10; // Increased speed
+    }
+
+    function drawFireworks() {
+        fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+        fireworks.forEach(firework => {
+            fireworksCtx.beginPath();
+            fireworksCtx.arc(firework.x, firework.y, firework.size, 0, Math.PI * 2);
+            fireworksCtx.fillStyle = firework.color;
+            fireworksCtx.fill();
+            
+            // Move the firework particles
+            firework.x += firework.velocityX;
+            firework.y += firework.velocityY;
+            firework.alpha -= 0.000000000001; // Slower alpha decay
+
+            // Remove fireworks that are no longer visible
+            if (firework.alpha <= 0) {
+                fireworks.splice(fireworks.indexOf(firework), 1);
+            }
+        });
+
+        // Continue the animation if there are fireworks left
+        if (fireworks.length > 0) {
+            requestAnimationFrame(drawFireworks);
+        }
+    }
+
+    drawFireworks();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Check if the puzzle is solved
 function checkWinCondition() {
   const currentOrder = Array.from(puzzleContainer.children).map(
     (tile) => tile.dataset.index
   );
 
+
+
+
   // If all tiles are in the correct order
   if (currentOrder.every((val, index) => val == index)) {
+
+
+     triggerFireworks(); // Trigger fireworks after finishing all levels
+                return;
     alert("Congratulations! You solved the puzzle!");
   }
 }
