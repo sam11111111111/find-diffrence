@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedding Photo Puzzle</title>
+
+
+<style type="text/css">
+  
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #fef5e7; /* Light wedding-themed color */
+}
+
+h1 {
+  color: #d4a373;
+}
+
+.puzzle-container {
+  display: grid;
+  grid-template-columns: repeat(4, 100px); /* 4x4 grid */
+  grid-gap: 5px;
+  margin: 20px auto;
+  width: 420px; /* Adjust based on grid size */
+  height: 420px;
+  border: 2px solid #d4a373;
+  background-color: white;
+}
+
+.tile {
+  width: 100px;
+  height: 100px;
+  background-size: 400px 400px; /* Match the original image size */
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  background-color: #d4a373;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #b88c5a;
+}
+
+
+</style>
+
+
+</head>
+<body>
+  <h1>Wedding Photo Puzzle</h1>
+  <div class="puzzle-container" id="puzzle-container"></div>
+  <button id="shuffle-btn">Shuffle</button>
+  <button id="restart-btn">Restart</button>
+
+
+
+
+  <script type="text/javascript">
+    
+
+const puzzleContainer = document.getElementById("puzzle-container");
+const shuffleButton = document.getElementById("shuffle-btn");
+const restartButton = document.getElementById("restart-btn");
+
+let tiles = [];
+const gridSize = 4;
+const imageUrl = "dog3.png"; // Add your image here
+
+// Create the puzzle
+function createPuzzle() {
+  puzzleContainer.innerHTML = ""; // Clear any existing tiles
+  tiles = [];
+  
+  for (let i = 0; i < gridSize * gridSize; i++) {
+    const tile = document.createElement("div");
+    tile.classList.add("tile");
+    tile.style.backgroundImage = `url(${imageUrl})`;
+    tile.style.backgroundPosition = `${-(i % gridSize) * 100}px ${-Math.floor(i / gridSize) * 100}px`;
+    tile.dataset.index = i;
+    tiles.push(tile);
+    puzzleContainer.appendChild(tile);
+  }
+}
+
+// Shuffle the tiles
+function shufflePuzzle() {
+  tiles.sort(() => Math.random() - 0.5);
+  tiles.forEach((tile) => puzzleContainer.appendChild(tile));
+}
+
+// Restart the puzzle
+function restartPuzzle() {
+  createPuzzle();
+}
+
+// Drag-and-drop logic can be added here for interactivity
+
+// Initialize
+createPuzzle();
+
+shuffleButton.addEventListener("click", shufflePuzzle);
+restartButton.addEventListener("click", restartPuzzle);
+
+
+  </script>
+</body>
+</html>
