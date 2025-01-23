@@ -67,7 +67,6 @@ button:hover {
 
   <script type="text/javascript">
     
-
 const puzzleContainer = document.getElementById("puzzle-container");
 const shuffleButton = document.getElementById("shuffle-btn");
 const restartButton = document.getElementById("restart-btn");
@@ -75,6 +74,7 @@ const restartButton = document.getElementById("restart-btn");
 let tiles = [];
 const gridSize = 4;
 const imageUrl = "dog3.png"; // Add your image here
+let draggedTile = null; // Track the tile being dragged
 
 // Create the puzzle
 function createPuzzle() {
@@ -87,6 +87,13 @@ function createPuzzle() {
     tile.style.backgroundImage = `url(${imageUrl})`;
     tile.style.backgroundPosition = `${-(i % gridSize) * 100}px ${-Math.floor(i / gridSize) * 100}px`;
     tile.dataset.index = i;
+    tile.draggable = true; // Make the tile draggable
+
+    // Add drag-and-drop event listeners
+    tile.addEventListener("dragstart", handleDragStart);
+    tile.addEventListener("dragover", handleDragOver);
+    tile.addEventListener("drop", handleDrop);
+
     tiles.push(tile);
     puzzleContainer.appendChild(tile);
   }
@@ -103,14 +110,51 @@ function restartPuzzle() {
   createPuzzle();
 }
 
-// Drag-and-drop logic can be added here for interactivity
+// Drag-and-Drop Event Handlers
+function handleDragStart(event) {
+  draggedTile = event.target; // The tile being dragged
+}
 
-// Initialize
+function handleDragOver(event) {
+  event.preventDefault(); // Allow dropping
+}
+
+function handleDrop(event) {
+  const targetTile = event.target; // The tile being dropped onto
+
+  // Swap positions of draggedTile and targetTile
+  const draggedIndex = draggedTile.dataset.index;
+  const targetIndex = targetTile.dataset.index;
+
+  // Swap dataset.index values
+  draggedTile.dataset.index = targetIndex;
+  targetTile.dataset.index = draggedIndex;
+
+  // Swap the tiles visually
+  const draggedParent = draggedTile.parentElement;
+  draggedParent.insertBefore(draggedTile, targetTile.nextSibling);
+  draggedParent.insertBefore(targetTile, draggedTile);
+
+  checkWinCondition(); // Check if the puzzle is solved
+}
+
+// Check if the puzzle is solved
+function checkWinCondition() {
+  const currentOrder = Array.from(puzzleContainer.children).map(
+    (tile) => tile.dataset.index
+  );
+
+  // If all tiles are in the correct order
+  if (currentOrder.every((val, index) => val == index)) {
+    alert("Congratulations! You solved the puzzle!");
+  }
+}
+
+// Initialize the puzzle
 createPuzzle();
 
 shuffleButton.addEventListener("click", shufflePuzzle);
 restartButton.addEventListener("click", restartPuzzle);
-
 
   </script>
 </body>
