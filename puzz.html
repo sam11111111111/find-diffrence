@@ -11,7 +11,7 @@
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #fef5e7; /* Wedding theme */
+  background-color: #fef5e7;
 }
 
 h1 {
@@ -28,7 +28,6 @@ h1 {
   max-width: 400px; /* Limit for larger screens */
   border: 2px solid #d4a373;
   background-color: white;
-  touch-action: manipulation; /* Improve touch responsiveness */
 }
 
 .tile {
@@ -37,7 +36,7 @@ h1 {
   background-size: 400% 400%; /* Match full image size */
   cursor: pointer;
   border: 1px solid #ddd;
-  user-select: none; /* Disable text selection */
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,6 +55,15 @@ button {
 
 button:hover {
   background-color: #b88c5a;
+}
+
+/* Highlight clicked tile */
+.tile:hover {
+  background-color: rgba(212, 163, 115, 0.3); /* Light hover effect */
+}
+
+.tile[style*="opacity: 0.7"] {
+  border: 2px solid #d4a373; /* Highlight selected tile */
 }
 
 
@@ -82,16 +90,11 @@ let tiles = [];
 const gridSize = 4;
 const imageUrl = "dog3.png"; // Add your wedding photo
 let firstTile = null;  // Track the first tile clicked
-let secondTile = null; // Track the second tile clicked
-let originalTilesOrder = []; // To store the original order
 
 // Create the puzzle (with the original order)
 function createPuzzle() {
   puzzleContainer.innerHTML = ""; // Clear any existing tiles
   tiles = [];
-  
-  // Store the original order of tiles (ordered grid)
-  originalTilesOrder = [];
   
   for (let i = 0; i < gridSize * gridSize; i++) {
     const tile = document.createElement("div");
@@ -104,7 +107,6 @@ function createPuzzle() {
     tile.addEventListener("click", handleTileClick);
 
     tiles.push(tile);
-    originalTilesOrder.push(tile); // Save the tile in original order
     puzzleContainer.appendChild(tile);
   }
 }
@@ -117,70 +119,42 @@ function shufflePuzzle() {
 
 // Restart the puzzle (reset to original order)
 function restartPuzzle() {
-  // Reset the puzzle to the original order
-  tiles = [...originalTilesOrder];
-  tiles.forEach((tile) => puzzleContainer.appendChild(tile));
-  
-  // Optionally, reset tile opacities and styles (if necessary)
-  tiles.forEach(tile => {
-    tile.style.opacity = "1"; // Reset opacity for all tiles
-  });
+  createPuzzle();  // Recreate puzzle in original order
 }
 
 // Handle tile click (swap logic)
 function handleTileClick(event) {
+  const clickedTile = event.target;
+  
+  // If no tile is selected yet, select the first one
   if (!firstTile) {
-    // Store the first tile clicked
-    firstTile = event.target;
-    firstTile.style.opacity = "1.5";  // Highlight first clicked tile
-  } else if (!secondTile) {
-    // Store the second tile clicked
-    secondTile = event.target;
-    secondTile.style.opacity = "1.5"; // Highlight second clicked tile
+    firstTile = clickedTile;
+    firstTile.style.opacity = "0.7";  // Highlight the clicked tile
+  } else if (firstTile && firstTile !== clickedTile) {
+    // If the second tile is clicked, swap positions
+    swapTiles(firstTile, clickedTile);
 
-    // Swap the tiles
-    swapTiles(firstTile, secondTile);
-
-    // Reset tile highlight
+    // Reset the highlight
     firstTile.style.opacity = "1";
-    secondTile.style.opacity = "1";
+    firstTile = null;  // Reset the first tile
 
-    // Clear first and second tile references
-    firstTile = null;
-    secondTile = null;
-
-    checkWinCondition(); // Check if the puzzle is solved
+    // Optional: Check if the puzzle is solved (not implemented here)
   }
 }
 
-// Swap the tiles
+// Swap two tiles
 function swapTiles(tile1, tile2) {
   const index1 = tile1.dataset.index;
   const index2 = tile2.dataset.index;
 
-  // Swap dataset.index values
+  // Swap the dataset.index values
   tile1.dataset.index = index2;
   tile2.dataset.index = index1;
 
-  // Swap the tiles in the DOM
+  // Swap the tiles visually in the DOM
   const parent = tile1.parentElement;
   parent.insertBefore(tile1, tile2.nextSibling);
   parent.insertBefore(tile2, tile1);
-}
-
-// Check if the puzzle is solved
-function checkWinCondition() {
-  const currentOrder = Array.from(puzzleContainer.children).map(
-    (tile) => tile.dataset.index
-  );
-
-  // If all tiles are in the correct order
-  if (currentOrder.every((val, index) => val == index)) {
-
-
-    
-    alert("Congratulations! You solved the puzzle!");
-  }
 }
 
 // Initialize the puzzle
