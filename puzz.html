@@ -80,7 +80,8 @@ const restartButton = document.getElementById("restart-btn");
 let tiles = [];
 const gridSize = 4;
 const imageUrl = "dog3.png"; // Add your wedding photo
-let draggedTile = null;
+let firstTile = null;  // Track the first tile clicked
+let secondTile = null; // Track the second tile clicked
 
 // Create the puzzle
 function createPuzzle() {
@@ -94,9 +95,8 @@ function createPuzzle() {
     tile.style.backgroundPosition = `${-(i % gridSize) * 100}px ${-Math.floor(i / gridSize) * 100}px`;
     tile.dataset.index = i;
 
-    // Add touch event listeners for mobile devices
-    tile.addEventListener("touchstart", handleTouchStart);
-    tile.addEventListener("touchend", handleTouchEnd);
+    // Add click event listener
+    tile.addEventListener("click", handleTileClick);
 
     tiles.push(tile);
     puzzleContainer.appendChild(tile);
@@ -114,38 +114,45 @@ function restartPuzzle() {
   createPuzzle();
 }
 
-// Handle touchstart (select the tile)
-function handleTouchStart(event) {
-  draggedTile = event.target; // Store the selected tile
-  draggedTile.style.opacity = "0.7"; // Highlight the tile being dragged
-}
+// Handle tile click (swap logic)
+function handleTileClick(event) {
+  if (!firstTile) {
+    // Store the first tile clicked
+    firstTile = event.target;
+    firstTile.style.opacity = "0.7";  // Highlight first clicked tile
+  } else if (!secondTile) {
+    // Store the second tile clicked
+    secondTile = event.target;
+    secondTile.style.opacity = "0.7"; // Highlight second clicked tile
 
-// Handle touchend (drop the tile)
-function handleTouchEnd(event) {
-  const targetTile = document.elementFromPoint(
-    event.changedTouches[0].clientX,
-    event.changedTouches[0].clientY
-  ); // Get the tile under the touch
+    // Swap the tiles
+    swapTiles(firstTile, secondTile);
 
-  if (targetTile && targetTile.classList.contains("tile") && targetTile !== draggedTile) {
-    // Swap the positions of draggedTile and targetTile
-    const draggedIndex = draggedTile.dataset.index;
-    const targetIndex = targetTile.dataset.index;
+    // Reset tile highlight
+    firstTile.style.opacity = "1";
+    secondTile.style.opacity = "1";
 
-    // Swap dataset.index values
-    draggedTile.dataset.index = targetIndex;
-    targetTile.dataset.index = draggedIndex;
-
-    // Swap the tiles visually
-    const draggedParent = draggedTile.parentElement;
-    draggedParent.insertBefore(draggedTile, targetTile.nextSibling);
-    draggedParent.insertBefore(targetTile, draggedTile);
+    // Clear first and second tile references
+    firstTile = null;
+    secondTile = null;
 
     checkWinCondition(); // Check if the puzzle is solved
   }
+}
 
-  draggedTile.style.opacity = "1"; // Reset tile opacity
-  draggedTile = null; // Clear the draggedTile
+// Swap the tiles
+function swapTiles(tile1, tile2) {
+  const index1 = tile1.dataset.index;
+  const index2 = tile2.dataset.index;
+
+  // Swap dataset.index values
+  tile1.dataset.index = index2;
+  tile2.dataset.index = index1;
+
+  // Swap the tiles in the DOM
+  const parent = tile1.parentElement;
+  parent.insertBefore(tile1, tile2.nextSibling);
+  parent.insertBefore(tile2, tile1);
 }
 
 // Check if the puzzle is solved
@@ -154,6 +161,7 @@ function checkWinCondition() {
     (tile) => tile.dataset.index
   );
 
+  // If all tiles are in the correct order
   if (currentOrder.every((val, index) => val == index)) {
     alert("Congratulations! You solved the puzzle!");
   }
