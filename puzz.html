@@ -1,164 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wedding Photo Puzzle</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Gamen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f6f2;
+            margin: 0;
+            padding: 0;
+        }
 
+        h1 {
+            margin: 20px 0;
+            font-size: 2rem;
+            color: #333;
+        }
 
-<style type="text/css">
-  
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #fef5e7;
-}
+        p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #555;
+        }
 
-h1 {
-  color: #d4a373;
-}
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
 
-.puzzle-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Adjust grid size */
-  grid-gap: 5px;
-  margin: 20px auto;
-  width: 90vw; /* Responsive width for mobile */
-  height: 90vw; /* Keep it square */
-  max-width: 400px; /* Limit for larger screens */
-  border: 2px solid #d4a373;
-  background-color: white;
-}
+        .card {
+            position: relative;
+            width: 100px;
+            height: 150px;
+            perspective: 1000px;
+        }
 
-.tile {
-  width: 100%;
-  height: 100%;
-  background-size: 400% 400%; /* Match full image size */
-  cursor: pointer;
-  border: 1px solid #ddd;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s ease;
-}
+        .card-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
 
-button {
-  padding: 10px 20px;
-  margin: 10px;
-  border: none;
-  background-color: #d4a373;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-}
+        .card.flip .card-inner {
+            transform: rotateY(180deg);
+        }
 
-button:hover {
-  background-color: #b88c5a;
-}
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+        }
 
-/* Highlight clicked tile */
-.tile.highlight {
-  opacity: 0.7;
-  border: 2px solid #d4a373; /* Highlight selected tile */
-}
+        .card-front {
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+        }
 
-</style>
+        .card-back {
+            background-color: black;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+        }
 
+        /* Congratulations Message */
+        #congratsMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff6347;
+            display: none;
+        }
 
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <h1>Wedding Photo Puzzle</h1>
-  <div class="puzzle-container" id="puzzle-container"></div>
-  <button id="shuffle-btn">Shuffle</button>
-  <button id="restart-btn">Restart</button>
+    <h1>Memory Game</h1>
+    <p>Moves: <span id="moves-counter">0</span></p>
+    <div id="game-board"></div>
+    <div id="congratsMessage" style="display:none;">🎉 Congratulations! You won!</div>
+    <canvas id="fireworksCanvas"></canvas>
 
+    <script>
+        const images = [
+            "dog3.png", "dog3.png", "dog3.png", "dog3.png",
+            "dog3.png", "dog3.png", "dog3.png", "dog3.png",
+            "dog3.png", "dog3.png", "dog3.png", "dog3.png",
+            "dog3.png", "dog3.png", "dog3.png", "dog3.png",
+          
+            "dog3.png", "dog3.png", "dog3.png", "dog3.png"
+        ];
 
+        let firstCard, secondCard;
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let moves = 0;
+        let matchedPairs = 0;
+        let gameStarted = false;
 
+        // Shuffle images
+        images.sort(() => 0.5 - Math.random());
 
-  <script type="text/javascript">
+        const gameBoard = document.getElementById("game-board");
+        const movesCounter = document.getElementById("moves-counter");
 
+        // Generate the game board
+        images.forEach(image => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front"></div>
+                    <div class="card-back" style="background-image: url('${image}')"></div>
+                </div>
+            `;
+            gameBoard.appendChild(card);
 
- // Add your wedding photo
-const puzzleContainer = document.getElementById("puzzle-container");
-const shuffleButton = document.getElementById("shuffle-btn");
-const restartButton = document.getElementById("restart-btn");
+            card.addEventListener("click", () => flipCard(card));
+        });
 
-let tiles = [];
-const gridSize = 4;
-const imageUrl = "dog3.png"; // Add your wedding photo
-let firstTile = null;  // Track the first tile clicked
+        // Function to show all cards for 5 seconds initially
+        function showAllCards() {
+            const allCards = document.querySelectorAll(".card");
+            allCards.forEach(card => card.classList.add("flip")); // Flip all cards to show images
 
-// Create the puzzle (with the original order)
-function createPuzzle() {
-  puzzleContainer.innerHTML = ""; // Clear any existing tiles
-  tiles = [];
-  
-  for (let i = 0; i < gridSize * gridSize; i++) {
-    const tile = document.createElement("div");
-    tile.classList.add("tile");
-    tile.style.backgroundImage = `url(${imageUrl})`;
-    tile.style.backgroundPosition = `${-(i % gridSize) * 100}px ${-Math.floor(i / gridSize) * 100}px`;
-    tile.dataset.index = i;
+            // After 5 seconds, flip all cards back to black
+            setTimeout(() => {
+                allCards.forEach(card => card.classList.remove("flip")); // Flip all cards back to black
+                gameStarted = true; // Start the game after initial 5 seconds
+            }, 5000); // Show images for 5 seconds
+        }
 
-    // Add click event listener
-    tile.addEventListener("click", handleTileClick);
+        // Start showing cards after a small delay
+        setTimeout(() => {
+            showAllCards();
+        }, 1000); // Delay to show cards initially
 
-    tiles.push(tile);
-    puzzleContainer.appendChild(tile);
-  }
-}
+        // Flip card logic
+        function flipCard(card) {
+            if (lockBoard || card === firstCard || card.classList.contains("flip") || !gameStarted) return;
 
-// Shuffle the tiles
-function shufflePuzzle() {
-  tiles.sort(() => Math.random() - 0.5); // Randomize the order
-  tiles.forEach((tile) => puzzleContainer.appendChild(tile)); // Reattach tiles to container
-}
+            card.classList.add("flip");
 
-// Restart the puzzle (reset to original order)
-function restartPuzzle() {
-  createPuzzle(); // Recreate puzzle in original order
-}
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = card;
+                return;
+            }
 
-// Handle tile click (swap logic)
-function handleTileClick(event) {
-  const clickedTile = event.target;
+            secondCard = card;
+            checkMatch();
+        }
 
-  // If no tile is selected yet, select the first one
-  if (!firstTile) {
-    firstTile = clickedTile;
-    firstTile.classList.add("highlight");  // Highlight the clicked tile
-  } else if (firstTile && firstTile !== clickedTile) {
-    // If the second tile is clicked, swap positions
-    swapTiles(firstTile, clickedTile);
+        // Check for match
+        function checkMatch() {
+            const isMatch =
+                firstCard.querySelector(".card-back").style.backgroundImage ===
+                secondCard.querySelector(".card-back").style.backgroundImage;
 
-    // Reset the highlight and firstTile
-    firstTile.classList.remove("highlight");
-    firstTile = null;
-  }
-}
+            moves++;
+            movesCounter.textContent = moves;
 
-// Swap two tiles
-function swapTiles(tile1, tile2) {
-  const index1 = tile1.dataset.index;
-  const index2 = tile2.dataset.index;
+            if (isMatch) {
+                matchedPairs++;
+                disableCards();
+                if (matchedPairs === images.length / 2) {
+                    setTimeout(() => {
+                        showMessage();
+                        triggerFireworks();
+                    }, 500);
+                }
+            } else {
+                unflipCards();
+            }
+        }
 
-  // Swap the dataset.index values
-  tile1.dataset.index = index2;
-  tile2.dataset.index = index1;
+        // Disable matched cards
+        function disableCards() {
+            firstCard.removeEventListener("click", flipCard);
+            secondCard.removeEventListener("click", flipCard);
+            resetBoard();
+        }
 
-  // Swap the tiles visually in the DOM
-  const parent = tile1.parentElement;
-  parent.insertBefore(tile1, tile2.nextSibling);
-  parent.insertBefore(tile2, tile1);
-}
+        // Unflip cards if not matched
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove("flip");
+                secondCard.classList.remove("flip");
+                resetBoard();
+            }, 1000);
+        }
 
-// Initialize the puzzle
-createPuzzle();
+        // Reset game board state
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
 
-shuffleButton.addEventListener("click", shufflePuzzle);
-restartButton.addEventListener("click", restartPuzzle);
+        // Show message
+        function showMessage() {
+            const messageElement = document.getElementById("congratsMessage");
+            messageElement.style.display = "block"; // Show the message
+        }
 
-  </script>
+        // Fireworks effect
+        function triggerFireworks() {
+            const fireworksCanvas = document.getElementById("fireworksCanvas");
+            fireworksCanvas.style.display = "block"; // Show the fireworks canvas
+            const fireworksCtx = fireworksCanvas.getContext("2d");
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+
+            const colors = ["#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff", "#ffff00"];
+            const fireworks = [];
+
+            // Generate fireworks
+            for (let i = 0; i < 100; i++) {
+                fireworks.push(new Firework());
+            }
+
+            function Firework() {
+                const randomEdge = Math.floor(Math.random() * 4);
+                switch (randomEdge) {
+                    case 0: // Top edge
+                        this.x = Math.random() * fireworksCanvas.width;
+                        this.y = 0;
+                        break;
+                    case 1: // Right edge
+                        this.x = fireworksCanvas.width;
+                        this.y = Math.random() * fireworksCanvas.height;
+                        break;
+                    case 2: // Bottom edge
+                        this.x = Math.random() * fireworksCanvas.width;
+                        this.y = fireworksCanvas.height;
+                        break;
+                    case 3: // Left edge
+                        this.x = 0;
+                        this.y = Math.random() * fireworksCanvas.height;
+                        break;
+                }
+
+                this.size = Math.random() * 3 + 1;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.alpha = 1;
+                this.velocityX = Math.random() * 10 - 5;
+                this.velocityY = Math.random() * 10 - 5;
+            }
+
+            function drawFireworks() {
+                fireworksCtx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+
+                fireworks.forEach((firework, index) => {
+                    fireworksCtx.beginPath();
+                    fireworksCtx.arc(firework.x, firework.y, firework.size, 0, Math.PI * 2);
+                    fireworksCtx.fillStyle = firework.color;
+                    fireworksCtx.fill();
+
+                    firework.x += firework.velocityX;
+                    firework.y += firework.velocityY;
+                    firework.alpha -= 0.01;
+                });
+
+                fireworks = fireworks.filter(firework => firework.alpha > 0);
+
+                if (fireworks.length > 0) {
+                    requestAnimationFrame(drawFireworks);
+                }
+            }
+
+            drawFireworks();
+        }
+    </script>
 </body>
 </html>
