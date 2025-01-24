@@ -98,13 +98,14 @@
             pointer-events: none;
             display: none;
         }
+      
     </style>
 </head>
 <body>
     <h1>ተመሳሳይ አለ እንዴ 🤔</h1>
     <p>ሙከራ: <span id="moves-counter">0</span></p>
     <div id="game-board"></div>
-    <div id="congratsMessage" style="display:none;"><center> 🎉 እንኳን ደስ አላችሁ! ጨዋታውን ጨርሰሃል! 🥳</center> </div>
+    <div id="congratsMessage" style="display:none;"><center> <img src="frame.png" style="width: 100px;"> 🎉 እንኳን ደስ አላችሁ! ጨዋታውን ጨርሰሃል! 🥳</center> </div>
     <canvas id="fireworksCanvas"></canvas>
 
     <script>
@@ -129,6 +130,7 @@
 
         const gameBoard = document.getElementById("game-board");
         const movesCounter = document.getElementById("moves-counter");
+   
 
         // Generate the game board
         images.forEach(image => {
