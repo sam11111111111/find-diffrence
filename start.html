@@ -5,23 +5,66 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title></title>
 	<style type="text/css">
-		body{
-			background-color: #F2F9FF;
-			color: #EB8317;
-		}
+	    body {
+            margin: 0;
+            display: grid;
+            grid-template-rows: 20% 80%; /* Top row and bottom row */
+            height: 100vh; /* Full viewport height */
+        }
+        .top {
+            background-color: #F3F8FF;
+            text-align: center;
+            padding: 10px;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 50% 50%; /* Left and main content */
+            height: 100vh;
+        }
+        .left {
+        	background: url('dog3.png') no-repeat center center;
+        	background-size:cover ;
+            background-color: #2a9d8f;
+            padding: 10px;
+            color: white;
+        }
+        .main {
+            background-color: #e9c46a;
+            padding: 10px;
+        }
+        a {
+        	text-decoration-line: none;
+        }
 	</style>
 </head>
 <body>
 
 <center>
-	<div>
-<h1>የጨዋታ ቦታ</h1>
+	
 
-<a href="g.html">ልዩነቱን </a><br>
+    <div class="top">
+        
+<h1>የጨዋታ ቦታ</h1>
+        
+    </div>
+    <div class="content">
+        <div class="left">
+          <center> <a href="g.html"> <h2>ልዩነቱን ፈልጉ 🧐 </h2> </a> </center>
+            
+        </div>
+        <div class="main">
+     <center>  <a href="puzz.html"> <h2>ተመሳሳይ አለ እንዴ </h2> </a> </center>
+  
+        </div>
+    </div>
+
+
+<!--
+<a href="g.html">ልዩነቱን </a><br><br>
 <a href="puzz.html">ተመሳሳይ አለ እንዴ </a>
 
+-->
 
-</div>
 
 </center>
 </body>

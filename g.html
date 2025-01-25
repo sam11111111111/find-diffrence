@@ -59,7 +59,9 @@
     <canvas id="gameCanvas"></canvas>
     <canvas id="fireworksCanvas"></canvas>
     <div id="message"></div>
-
+ <div id="myDiv">
+        <a href="start.html">home</a>
+    </div>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
@@ -117,6 +119,12 @@
             if (levelIndex >= levels.length) {
 
                 showMessage("🎉እንኳን ደስ አለዎት!🎉 አደረጉት! የማይታመን ትኩረት እና የተሳለ አይኖች👀! የምር የቁም ጭብጨባ ይገባዎታል👏🧍 ... እና ተጨማሪ ኬክም!😉🍰");
+                //showMessage("mr");
+
+                const div = document.getElementById('myDiv');
+                console.log(div.innerHTML); // Output: <p>Hello, world!</p>
+    
+
                 triggerFireworks(); // Trigger fireworks after finishing all levels
                 return;
             }
