@@ -18,15 +18,20 @@
         }
         .content {
             display: grid;
-            grid-template-columns: 50% 50%; /* Left and main content */
+            grid-template-rows: 50% 50%; /* Left and main content */
             height: 100vh;
         }
         .left {
         	background: url('dog3.png') no-repeat center center;
-        	background-size:cover ;
+        	background-size: contain;
             background-color: #2a9d8f;
-            padding: 10px;
+    
+
+ 			padding: 20px;
             color: white;
+            overflow-y: auto;
+            height: 100%;
+
         }
         .main {
             background-color: #e9c46a;
@@ -53,7 +58,7 @@
             
         </div>
         <div class="main">
-     <center>  <a href="puzz.html"> <h2>ተመሳሳይ አለ እንዴ </h2> </a> </center>
+     <center>  <a href="puzz.html"> <h2>ተመሳሳይ አለ እንዴ 🤔</h2> </a> </center>
   
         </div>
     </div>
